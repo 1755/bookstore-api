@@ -1,6 +1,9 @@
 name: CD
 
 on:
+  push:
+    branches:
+      - "*"
   release:
     types: [published]
   workflow_dispatch:
