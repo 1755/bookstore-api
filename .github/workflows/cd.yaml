@@ -1,0 +1,30 @@
+name: CD
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      TAG:
+        required: true
+        description: Docker image tag
+        default: latest
+
+jobs:
+  publish:
+    name: Publish the Docker image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Detect the release tag
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      - name: Build and push the image
+        env:
+          REGISTRY: registry-todo
+          REPOSITORY: repository-todo
+          RELEASE_VERSION: ${{ github.event.inputs.TAG || env.RELEASE_VERSION }}
+        run: |
+          docker build --build-arg RELEASE_VERSION=${RELEASE_VERSION} -t $REGISTRY/$REPOSITORY:$RELEASE_VERSION .
+          # docker push $REGISTRY/$REPOSITORY:$RELEASE_VERSION
+          echo "Push to $REGISTRY/$REPOSITORY:$RELEASE_VERSION"
