@@ -1,9 +1,6 @@
 name: CD
 
 on:
-  push:
-    branches:
-      - "*"
   release:
     types: [published]
   workflow_dispatch:
@@ -29,5 +26,6 @@ jobs:
           RELEASE_VERSION: ${{ github.event.inputs.TAG || env.RELEASE_VERSION }}
         run: |
           docker build --build-arg RELEASE_VERSION=${RELEASE_VERSION} -t $REGISTRY/$REPOSITORY:$RELEASE_VERSION .
+          # Uncomment this to push to the registry, don't forget to set the registry and repository in the env
           # docker push $REGISTRY/$REPOSITORY:$RELEASE_VERSION
           echo "Push to $REGISTRY/$REPOSITORY:$RELEASE_VERSION"
