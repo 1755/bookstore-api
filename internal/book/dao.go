@@ -221,8 +221,7 @@ func (dao *BasicDAO) Delete(ctx context.Context, id ID) error {
 
 	query := goqu.Dialect("postgres").
 		Delete("books").
-		Where(goqu.C("id").Eq(id)).
-		Prepared(true)
+		Where(goqu.C("id").Eq(id))
 
 	sql, args, err := query.ToSQL()
 	if err != nil {
@@ -230,7 +229,7 @@ func (dao *BasicDAO) Delete(ctx context.Context, id ID) error {
 	}
 
 	logger.Debug("executing delete query", zap.String("sql", sql), zap.Any("args", args))
-	result, err := dao.pool.Exec(ctx, sql, args)
+	result, err := dao.pool.Exec(ctx, sql)
 	if err != nil {
 		return err
 	}

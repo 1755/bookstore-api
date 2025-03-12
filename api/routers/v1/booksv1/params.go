@@ -10,7 +10,7 @@ import (
 type GetBooksParams struct {
 	PageLimit   uint   `form:"page[limit]" binding:"required,min=1,max=100"`
 	PageOffset  uint   `form:"page[offset]" binding:"omitempty"`
-	Sort        string `form:"sort" binding:"omitempty,oneof=title -title publishedYear -publishedYear"`
+	Sort        string `form:"sort" binding:"omitempty,oneof=title -title publishedYear -publishedYear updatedAt -updatedAt"`
 	FilterTitle string `form:"filter[title]" binding:"omitempty,min=2,max=50"`
 }
 
