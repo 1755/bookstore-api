@@ -528,6 +528,155 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/books/{id}/authors": {
+            "get": {
+                "description": "Returns a list of books. Returns 500 if there is a database error. Returns 200 and the book data on success.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "books"
+                ],
+                "summary": "get book authors",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Book ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Document-array_schemas_Resource-schemas_Author"
+                        }
+                    },
+                    "400": {
+                        "description": "On validation error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.DocumentError"
+                        }
+                    },
+                    "500": {
+                        "description": "On internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a book author in the system.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "books"
+                ],
+                "summary": "create book author",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Book ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Book data in json api format",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Document-schemas_CreateResource-schemas_CreateBookAuthorsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Book author created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Document-schemas_Resource-schemas_Book"
+                        }
+                    },
+                    "400": {
+                        "description": "On validation error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.DocumentError"
+                        }
+                    },
+                    "500": {
+                        "description": "On internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/books/{id}/authors/{author_id}": {
+            "delete": {
+                "description": "Deletes a book from the system by its ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "books"
+                ],
+                "summary": "delete book by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Book ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Author ID",
+                        "name": "author_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "On validation error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.DocumentError"
+                        }
+                    },
+                    "404": {
+                        "description": "On book not found",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.DocumentError"
+                        }
+                    },
+                    "500": {
+                        "description": "On internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -585,6 +734,18 @@ const docTemplate = `{
                 }
             }
         },
+        "schemas.CreateBookAuthorsRequest": {
+            "type": "object",
+            "required": [
+                "author_id"
+            ],
+            "properties": {
+                "author_id": {
+                    "type": "integer",
+                    "minimum": 1
+                }
+            }
+        },
         "schemas.CreateBookRequest": {
             "type": "object",
             "required": [
@@ -614,6 +775,21 @@ const docTemplate = `{
             "properties": {
                 "attributes": {
                     "$ref": "#/definitions/schemas.CreateAuthorRequest"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "schemas.CreateResource-schemas_CreateBookAuthorsRequest": {
+            "type": "object",
+            "required": [
+                "attributes",
+                "type"
+            ],
+            "properties": {
+                "attributes": {
+                    "$ref": "#/definitions/schemas.CreateBookAuthorsRequest"
                 },
                 "type": {
                     "type": "string"
@@ -668,6 +844,17 @@ const docTemplate = `{
             "properties": {
                 "data": {
                     "$ref": "#/definitions/schemas.CreateResource-schemas_CreateAuthorRequest"
+                },
+                "links": {
+                    "$ref": "#/definitions/schemas.DocumentLink"
+                }
+            }
+        },
+        "schemas.Document-schemas_CreateResource-schemas_CreateBookAuthorsRequest": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/schemas.CreateResource-schemas_CreateBookAuthorsRequest"
                 },
                 "links": {
                     "$ref": "#/definitions/schemas.DocumentLink"

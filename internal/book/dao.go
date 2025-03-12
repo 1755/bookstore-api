@@ -301,8 +301,8 @@ func (dao *BasicDAO) UnlinkAuthor(ctx context.Context, id ID, authorID int32) er
 
 	query := goqu.Dialect("postgres").
 		Delete("book_authors").
-		Where(goqu.C("book_id").Eq(id), goqu.C("author_id").Eq(authorID)).
-		Prepared(true)
+		Where(goqu.C("book_id").Eq(id)).
+		Where(goqu.C("author_id").Eq(authorID))
 
 	sql, args, err := query.ToSQL()
 	if err != nil {
@@ -310,7 +310,7 @@ func (dao *BasicDAO) UnlinkAuthor(ctx context.Context, id ID, authorID int32) er
 	}
 
 	logger.Debug("executing unlink author query", zap.String("sql", sql), zap.Any("args", args))
-	result, err := dao.pool.Exec(ctx, sql, args)
+	result, err := dao.pool.Exec(ctx, sql)
 	if err != nil {
 		return err
 	}

@@ -3,7 +3,14 @@ package book
 import "context"
 
 type Service interface {
-	DAO
+	GetByID(ctx context.Context, id ID) (*Model, error)
+	GetMany(ctx context.Context, params *GetManyParams) ([]*Model, error)
+	GetManyByAuthorID(ctx context.Context, id int32) ([]*Model, error)
+	Create(ctx context.Context, model *Model) (*Model, error)
+	Update(ctx context.Context, id ID, fields ...UpdateField) (*Model, error)
+	Delete(ctx context.Context, id ID) error
+	LinkAuthor(ctx context.Context, id ID, authorID int32) error
+	UnlinkAuthor(ctx context.Context, id ID, authorID int32) error
 }
 
 var _ Service = (*BasicService)(nil)

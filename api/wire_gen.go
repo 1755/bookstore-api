@@ -9,6 +9,7 @@ package api
 import (
 	"github.com/1755/bookstore-api/api/routers/health"
 	"github.com/1755/bookstore-api/api/routers/v1/authorsv1"
+	"github.com/1755/bookstore-api/api/routers/v1/bookauthorsv1"
 	"github.com/1755/bookstore-api/api/routers/v1/booksv1"
 	"github.com/1755/bookstore-api/internal/author"
 	"github.com/1755/bookstore-api/internal/book"
@@ -55,7 +56,11 @@ func InjectApplication(configPath ConfigPath) (*Application, func(), error) {
 	authorsv1DeleteRouterBuilder := authorsv1.NewDeleteRouterBuilder(authorBasicService)
 	authorsv1UpdateRouterBuilder := authorsv1.NewUpdateRouterBuilder(authorBasicService, routersConfig)
 	authorsv1RouterBuilder := authorsv1.NewRouterBuilder(authorsv1ListRouterBuilder, authorsv1GetRouterBuilder, authorsv1CreateRouterBuilder, authorsv1DeleteRouterBuilder, authorsv1UpdateRouterBuilder)
-	server := NewServer(serverConfig, registry, logger, routerBuilder, booksv1RouterBuilder, authorsv1RouterBuilder)
+	bookauthorsv1ListRouterBuilder := bookauthorsv1.NewListRouterBuilder(authorBasicService, routersConfig)
+	bookauthorsv1CreateRouterBuilder := bookauthorsv1.NewCreateRouterBuilder(basicService, authorBasicService, routersConfig)
+	bookauthorsv1DeleteRouterBuilder := bookauthorsv1.NewDeleteRouterBuilder(basicService)
+	bookauthorsv1RouterBuilder := bookauthorsv1.NewRouterBuilder(bookauthorsv1ListRouterBuilder, bookauthorsv1CreateRouterBuilder, bookauthorsv1DeleteRouterBuilder)
+	server := NewServer(serverConfig, registry, logger, routerBuilder, booksv1RouterBuilder, authorsv1RouterBuilder, bookauthorsv1RouterBuilder)
 	application := NewApplication(configPath, server)
 	return application, func() {
 		cleanup()

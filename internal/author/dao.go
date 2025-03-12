@@ -235,11 +235,11 @@ func (dao *BasicDAO) GetManyByBookID(ctx context.Context, id int32) ([]*Model, e
 	logger := lgr.GetLogger(ctx)
 
 	query := goqu.Dialect("postgres").
-		Select("author.id", "author.name", "author.bio", "books.created_at", "books.updated_at").
+		Select("authors.id", "authors.name", "authors.bio", "authors.created_at", "authors.updated_at").
 		From("authors").
 		InnerJoin(goqu.T("book_authors"), goqu.On(
-			goqu.C("book_authors.author_id").Eq(goqu.T("author.id")),
-			goqu.C("book_authors.book_id").Eq(id),
+			goqu.Ex{"book_authors.author_id": goqu.I("authors.id")},
+			goqu.Ex{"book_authors.book_id": id},
 		)).
 		Prepared(true)
 

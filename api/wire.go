@@ -6,6 +6,7 @@ package api
 import (
 	"github.com/1755/bookstore-api/api/routers/health"
 	"github.com/1755/bookstore-api/api/routers/v1/authorsv1"
+	"github.com/1755/bookstore-api/api/routers/v1/bookauthorsv1"
 	"github.com/1755/bookstore-api/api/routers/v1/booksv1"
 	"github.com/1755/bookstore-api/internal/author"
 	"github.com/1755/bookstore-api/internal/book"
@@ -26,6 +27,7 @@ func InjectApplication(
 		health.Module,
 		booksv1.Module,
 		authorsv1.Module,
+		bookauthorsv1.Module,
 		book.Module,
 		author.Module,
 		pg.Module,

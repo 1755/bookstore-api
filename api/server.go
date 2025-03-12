@@ -9,6 +9,7 @@ import (
 	"github.com/1755/bookstore-api/api/middlewares"
 	"github.com/1755/bookstore-api/api/routers/health"
 	"github.com/1755/bookstore-api/api/routers/v1/authorsv1"
+	"github.com/1755/bookstore-api/api/routers/v1/bookauthorsv1"
 	"github.com/1755/bookstore-api/api/routers/v1/booksv1"
 	docs "github.com/1755/bookstore-api/docs"
 	"github.com/gin-contrib/cors"
@@ -45,6 +46,7 @@ func NewServer(
 	health *health.RouterBuilder,
 	booksv1 *booksv1.RouterBuilder,
 	authorsv1 *authorsv1.RouterBuilder,
+	bookauthorsv1 *bookauthorsv1.RouterBuilder,
 ) *Server {
 	docs.SwaggerInfo.Title = "Bookstore API"
 	docs.SwaggerInfo.BasePath = "/v1"
@@ -64,6 +66,7 @@ func NewServer(
 	health.Build(root)
 	booksv1.Build(root)
 	authorsv1.Build(root)
+	bookauthorsv1.Build(root)
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf("%s:%d", config.Address, config.Port),

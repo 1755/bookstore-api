@@ -5,7 +5,12 @@ import (
 )
 
 type Service interface {
-	DAO
+	GetByID(ctx context.Context, id ID) (*Model, error)
+	GetMany(ctx context.Context, params *GetManyParams) ([]*Model, error)
+	GetManyByBookID(ctx context.Context, id int32) ([]*Model, error)
+	Create(ctx context.Context, model *Model) (*Model, error)
+	Update(ctx context.Context, id ID, fields ...UpdateField) (*Model, error)
+	Delete(ctx context.Context, id ID) error
 }
 
 var _ Service = (*BasicService)(nil)
