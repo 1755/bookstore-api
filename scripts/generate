@@ -2,3 +2,4 @@
 
 swag init
 go generate ./...
+mockery
