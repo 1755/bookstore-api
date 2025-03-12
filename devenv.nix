@@ -11,6 +11,7 @@
     pkgs.git
     pkgs.docker
     pkgs.httpie
+    pkgs.postgresql_17
    ];
 
   # https://devenv.sh/languages/
@@ -22,7 +23,21 @@
   # processes.cargo-watch.exec = "cargo-watch";
 
   # https://devenv.sh/services/
-  services = {};
+  services = {
+    postgres = {
+      enable = true;
+      package = pkgs.postgresql_17;
+      initialDatabases = [
+        {
+          name = "postgres";
+          user = "postgres";
+          pass = "postgres";
+        }
+      ];
+      listen_addresses = "127.0.0.1";
+      port = 5432;
+    };
+  };
 
   # https://devenv.sh/scripts/
   scripts.hello.exec = ''

@@ -1,3 +1,14 @@
+logger:
+  level: debug
 server:
   address: 0.0.0.0
   port: 8080
+monitoring:
+  address: 0.0.0.0
+  port: 9999
+routers:
+  baseURL: http://localhost:8080
+postgres:
+  uri: postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable
+  minConns: 0
+  maxConns: 10

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/1755/bookstore-api/api/routers"
+	"github.com/1755/bookstore-api/internal/pg"
 	"github.com/go-playground/validator/v10"
 	"github.com/google/wire"
 	"github.com/spf13/viper"
@@ -12,7 +14,11 @@ import (
 type ConfigPath string
 
 type Config struct {
-	Server *ServerConfig `validate:"required"`
+	Logger     *LoggerConfig     `validate:"required"`
+	Server     *ServerConfig     `validate:"required"`
+	Monitoring *MonitoringConfig `validate:"required"`
+	Routers    *routers.Config   `validate:"required"`
+	Postgres   *pg.Config        `validate:"required"`
 }
 
 func NewConfig(configPath ConfigPath) (Config, error) {
@@ -44,6 +50,10 @@ var ConfigModule = wire.NewSet(
 	NewConfig,
 	wire.FieldsOf(
 		new(Config),
+		"Logger",
 		"Server",
+		"Monitoring",
+		"Routers",
+		"Postgres",
 	),
 )

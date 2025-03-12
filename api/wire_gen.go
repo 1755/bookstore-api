@@ -8,6 +8,11 @@ package api
 
 import (
 	"github.com/1755/bookstore-api/api/routers/health"
+	"github.com/1755/bookstore-api/api/routers/v1/authorsv1"
+	"github.com/1755/bookstore-api/api/routers/v1/booksv1"
+	"github.com/1755/bookstore-api/internal/author"
+	"github.com/1755/bookstore-api/internal/book"
+	"github.com/1755/bookstore-api/internal/pg"
 )
 
 // Injectors from wire.go:
@@ -18,9 +23,41 @@ func InjectApplication(configPath ConfigPath) (*Application, func(), error) {
 		return nil, nil, err
 	}
 	serverConfig := config.Server
-	routerBuilder := health.NewRouterBuilder()
-	server := NewServer(serverConfig, routerBuilder)
+	registry := NewMonitoring()
+	loggerConfig := config.Logger
+	logger, cleanup, err := NewLogger(loggerConfig)
+	if err != nil {
+		return nil, nil, err
+	}
+	getRouterBuilder := health.NewGetRouterBuilder()
+	routerBuilder := health.NewRouterBuilder(getRouterBuilder)
+	context := NewContext(logger)
+	pgConfig := config.Postgres
+	pool, err := pg.NewBasicPool(context, pgConfig)
+	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
+	basicDAO := book.NewBasicDAO(pool)
+	basicService := book.NewBasicService(basicDAO)
+	routersConfig := config.Routers
+	listRouterBuilder := booksv1.NewListRouterBuilder(basicService, routersConfig)
+	booksv1GetRouterBuilder := booksv1.NewGetRouterBuilder(basicService, routersConfig)
+	createRouterBuilder := booksv1.NewCreateRouterBuilder(basicService, routersConfig)
+	deleteRouterBuilder := booksv1.NewDeleteRouterBuilder(basicService)
+	updateRouterBuilder := booksv1.NewUpdateRouterBuilder(basicService, routersConfig)
+	booksv1RouterBuilder := booksv1.NewRouterBuilder(listRouterBuilder, booksv1GetRouterBuilder, createRouterBuilder, deleteRouterBuilder, updateRouterBuilder)
+	authorBasicDAO := author.NewBasicDAO(pool)
+	authorBasicService := author.NewBasicService(authorBasicDAO)
+	authorsv1ListRouterBuilder := authorsv1.NewListRouterBuilder(authorBasicService, routersConfig)
+	authorsv1GetRouterBuilder := authorsv1.NewGetRouterBuilder(authorBasicService, routersConfig)
+	authorsv1CreateRouterBuilder := authorsv1.NewCreateRouterBuilder(authorBasicService, routersConfig)
+	authorsv1DeleteRouterBuilder := authorsv1.NewDeleteRouterBuilder(authorBasicService)
+	authorsv1UpdateRouterBuilder := authorsv1.NewUpdateRouterBuilder(authorBasicService, routersConfig)
+	authorsv1RouterBuilder := authorsv1.NewRouterBuilder(authorsv1ListRouterBuilder, authorsv1GetRouterBuilder, authorsv1CreateRouterBuilder, authorsv1DeleteRouterBuilder, authorsv1UpdateRouterBuilder)
+	server := NewServer(serverConfig, registry, logger, routerBuilder, booksv1RouterBuilder, authorsv1RouterBuilder)
 	application := NewApplication(configPath, server)
 	return application, func() {
+		cleanup()
 	}, nil
 }

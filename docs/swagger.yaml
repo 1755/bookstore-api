@@ -1,0 +1,579 @@
+definitions:
+  schemas.Author:
+    properties:
+      bio:
+        type: string
+      createdAt:
+        type: string
+      name:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  schemas.Book:
+    properties:
+      createdAt:
+        type: string
+      publishedYear:
+        type: integer
+      summary:
+        type: string
+      title:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  schemas.CreateAuthorRequest:
+    properties:
+      bio:
+        maxLength: 5000
+        type: string
+      name:
+        maxLength: 150
+        minLength: 1
+        type: string
+    required:
+    - name
+    type: object
+  schemas.CreateBookRequest:
+    properties:
+      publishedYear:
+        type: integer
+      summary:
+        maxLength: 5000
+        type: string
+      title:
+        maxLength: 1024
+        minLength: 1
+        type: string
+    required:
+    - title
+    type: object
+  schemas.CreateResource-schemas_CreateAuthorRequest:
+    properties:
+      attributes:
+        $ref: '#/definitions/schemas.CreateAuthorRequest'
+      type:
+        type: string
+    required:
+    - attributes
+    - type
+    type: object
+  schemas.CreateResource-schemas_CreateBookRequest:
+    properties:
+      attributes:
+        $ref: '#/definitions/schemas.CreateBookRequest'
+      type:
+        type: string
+    required:
+    - attributes
+    - type
+    type: object
+  schemas.Document-array_schemas_Resource-schemas_Author:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/schemas.Resource-schemas_Author'
+        type: array
+      links:
+        $ref: '#/definitions/schemas.DocumentLink'
+    type: object
+  schemas.Document-array_schemas_Resource-schemas_Book:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/schemas.Resource-schemas_Book'
+        type: array
+      links:
+        $ref: '#/definitions/schemas.DocumentLink'
+    type: object
+  schemas.Document-schemas_CreateResource-schemas_CreateAuthorRequest:
+    properties:
+      data:
+        $ref: '#/definitions/schemas.CreateResource-schemas_CreateAuthorRequest'
+      links:
+        $ref: '#/definitions/schemas.DocumentLink'
+    type: object
+  schemas.Document-schemas_CreateResource-schemas_CreateBookRequest:
+    properties:
+      data:
+        $ref: '#/definitions/schemas.CreateResource-schemas_CreateBookRequest'
+      links:
+        $ref: '#/definitions/schemas.DocumentLink'
+    type: object
+  schemas.Document-schemas_Resource-schemas_Author:
+    properties:
+      data:
+        $ref: '#/definitions/schemas.Resource-schemas_Author'
+      links:
+        $ref: '#/definitions/schemas.DocumentLink'
+    type: object
+  schemas.Document-schemas_Resource-schemas_Book:
+    properties:
+      data:
+        $ref: '#/definitions/schemas.Resource-schemas_Book'
+      links:
+        $ref: '#/definitions/schemas.DocumentLink'
+    type: object
+  schemas.Document-schemas_UpdateResource-schemas_UpdateAuthorRequest:
+    properties:
+      data:
+        $ref: '#/definitions/schemas.UpdateResource-schemas_UpdateAuthorRequest'
+      links:
+        $ref: '#/definitions/schemas.DocumentLink'
+    type: object
+  schemas.Document-schemas_UpdateResource-schemas_UpdateBookRequest:
+    properties:
+      data:
+        $ref: '#/definitions/schemas.UpdateResource-schemas_UpdateBookRequest'
+      links:
+        $ref: '#/definitions/schemas.DocumentLink'
+    type: object
+  schemas.DocumentError:
+    properties:
+      errors:
+        items:
+          $ref: '#/definitions/schemas.Error'
+        type: array
+    type: object
+  schemas.DocumentLink:
+    properties:
+      first:
+        type: string
+      next:
+        type: string
+      prev:
+        type: string
+      self:
+        type: string
+    type: object
+  schemas.Error:
+    properties:
+      detail:
+        type: string
+      title:
+        type: string
+    type: object
+  schemas.Link:
+    properties:
+      self:
+        type: string
+    type: object
+  schemas.Resource-schemas_Author:
+    properties:
+      attributes:
+        $ref: '#/definitions/schemas.Author'
+      id:
+        type: string
+      links:
+        $ref: '#/definitions/schemas.Link'
+      type:
+        type: string
+    type: object
+  schemas.Resource-schemas_Book:
+    properties:
+      attributes:
+        $ref: '#/definitions/schemas.Book'
+      id:
+        type: string
+      links:
+        $ref: '#/definitions/schemas.Link'
+      type:
+        type: string
+    type: object
+  schemas.UpdateAuthorRequest:
+    properties:
+      bio:
+        maxLength: 5000
+        type: string
+      name:
+        maxLength: 150
+        minLength: 1
+        type: string
+    type: object
+  schemas.UpdateBookRequest:
+    properties:
+      publishedYear:
+        type: integer
+      summary:
+        maxLength: 5000
+        type: string
+      title:
+        maxLength: 1024
+        minLength: 1
+        type: string
+    type: object
+  schemas.UpdateResource-schemas_UpdateAuthorRequest:
+    properties:
+      attributes:
+        $ref: '#/definitions/schemas.UpdateAuthorRequest'
+      id:
+        type: string
+      type:
+        type: string
+    required:
+    - attributes
+    - id
+    - type
+    type: object
+  schemas.UpdateResource-schemas_UpdateBookRequest:
+    properties:
+      attributes:
+        $ref: '#/definitions/schemas.UpdateBookRequest'
+      id:
+        type: string
+      type:
+        type: string
+    required:
+    - attributes
+    - id
+    - type
+    type: object
+info:
+  contact: {}
+paths:
+  /authors/:
+    get:
+      consumes:
+      - application/json
+      description: Returns a list of authors. Returns 500 if there is a database error.
+        Returns 200 and the author data on success.
+      parameters:
+      - description: 'Limit (default: 25, min: 1, max: 100)'
+        in: query
+        name: page[size]
+        type: integer
+      - description: 'Cursor (min: 1, max: 4)'
+        in: query
+        name: page[cursor]
+        type: string
+      - description: 'Sort (default: -updatedAt, allowed: -updatedAt, updatedAt, -name,
+          name)'
+        in: query
+        name: sort
+        type: string
+      - description: 'Filter name (default: empty, min: 2, max: 50)'
+        in: query
+        name: filter[name]
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Document-array_schemas_Resource-schemas_Author'
+        "400":
+          description: On validation error
+          schema:
+            $ref: '#/definitions/schemas.DocumentError'
+        "500":
+          description: On internal server error
+          schema:
+            type: string
+      summary: get authors
+      tags:
+      - authors
+    post:
+      consumes:
+      - application/json
+      description: Creates an author in the system.
+      parameters:
+      - description: Author data in json api format
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.Document-schemas_CreateResource-schemas_CreateAuthorRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Author created successfully
+          schema:
+            $ref: '#/definitions/schemas.Document-schemas_Resource-schemas_Author'
+        "400":
+          description: On validation error
+          schema:
+            $ref: '#/definitions/schemas.DocumentError'
+        "500":
+          description: On internal server error
+          schema:
+            type: string
+      summary: create author
+      tags:
+      - authors
+  /authors/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes an author from the system by its ID.
+      parameters:
+      - description: Author ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: On validation error
+          schema:
+            $ref: '#/definitions/schemas.DocumentError'
+        "404":
+          description: On author not found
+          schema:
+            $ref: '#/definitions/schemas.DocumentError'
+        "500":
+          description: On internal server error
+          schema:
+            type: string
+      summary: delete author by id
+      tags:
+      - authors
+    get:
+      consumes:
+      - application/json
+      description: Gets an author from the database by its ID
+      parameters:
+      - description: Author ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Document-schemas_Resource-schemas_Author'
+        "400":
+          description: On validation error
+          schema:
+            $ref: '#/definitions/schemas.DocumentError'
+        "404":
+          description: On author not found
+          schema:
+            $ref: '#/definitions/schemas.DocumentError'
+        "500":
+          description: On internal server error
+          schema:
+            type: string
+      summary: get author by id
+      tags:
+      - authors
+    patch:
+      consumes:
+      - application/json
+      description: Updates an author in the system by its ID.
+      parameters:
+      - description: Author ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Author data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.Document-schemas_UpdateResource-schemas_UpdateAuthorRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Author updated
+          schema:
+            $ref: '#/definitions/schemas.Document-schemas_Resource-schemas_Author'
+        "400":
+          description: "On\tvalidation\terror"
+          schema:
+            $ref: '#/definitions/schemas.DocumentError'
+        "404":
+          description: "On\tauthor not found"
+          schema:
+            $ref: '#/definitions/schemas.DocumentError'
+        "500":
+          description: "On\tinternal server\terror"
+          schema:
+            type: string
+      summary: update author by id
+      tags:
+      - authors
+  /books/:
+    get:
+      consumes:
+      - application/json
+      description: Returns a list of books. Returns 500 if there is a database error.
+        Returns 200 and the book data on success.
+      parameters:
+      - description: 'Limit (default: 25, min: 1, max: 100)'
+        in: query
+        name: page[size]
+        type: integer
+      - description: 'Cursor (min: 1, max: 4)'
+        in: query
+        name: page[cursor]
+        type: string
+      - description: 'Sort (default: -updatedAt, allowed: -updatedAt, updatedAt, -title,
+          title)'
+        in: query
+        name: sort
+        type: string
+      - description: 'Filter title (default: empty, min: 2, max: 50)'
+        in: query
+        name: filter[title]
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Document-array_schemas_Resource-schemas_Book'
+        "400":
+          description: On validation error
+          schema:
+            $ref: '#/definitions/schemas.DocumentError'
+        "500":
+          description: On internal server error
+          schema:
+            type: string
+      summary: get books
+      tags:
+      - books
+    post:
+      consumes:
+      - application/json
+      description: Creates a book in the system.
+      parameters:
+      - description: Book data in json api format
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.Document-schemas_CreateResource-schemas_CreateBookRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Book created successfully
+          schema:
+            $ref: '#/definitions/schemas.Document-schemas_Resource-schemas_Book'
+        "400":
+          description: On validation error
+          schema:
+            $ref: '#/definitions/schemas.DocumentError'
+        "500":
+          description: On internal server error
+          schema:
+            type: string
+      summary: create book
+      tags:
+      - books
+  /books/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a book from the system by its ID.
+      parameters:
+      - description: Book ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: On validation error
+          schema:
+            $ref: '#/definitions/schemas.DocumentError'
+        "404":
+          description: On book not found
+          schema:
+            $ref: '#/definitions/schemas.DocumentError'
+        "500":
+          description: On internal server error
+          schema:
+            type: string
+      summary: delete book by id
+      tags:
+      - books
+    get:
+      consumes:
+      - application/json
+      description: Gets a book from the database by its ID
+      parameters:
+      - description: Book ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Document-schemas_Resource-schemas_Book'
+        "400":
+          description: On validation error
+          schema:
+            $ref: '#/definitions/schemas.DocumentError'
+        "404":
+          description: On book not found
+          schema:
+            $ref: '#/definitions/schemas.DocumentError'
+        "500":
+          description: On internal server error
+          schema:
+            type: string
+      summary: get book by id
+      tags:
+      - books
+    patch:
+      consumes:
+      - application/json
+      description: Updates a book in the system by its ID.
+      parameters:
+      - description: Book ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Book data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.Document-schemas_UpdateResource-schemas_UpdateBookRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Book updated
+          schema:
+            $ref: '#/definitions/schemas.Document-schemas_Resource-schemas_Book'
+        "400":
+          description: "On\tvalidation\terror"
+          schema:
+            $ref: '#/definitions/schemas.DocumentError'
+        "404":
+          description: "On\tbook not found"
+          schema:
+            $ref: '#/definitions/schemas.DocumentError'
+        "500":
+          description: "On\tinternal server\terror"
+          schema:
+            type: string
+      summary: update book by id
+      tags:
+      - books
+swagger: "2.0"
