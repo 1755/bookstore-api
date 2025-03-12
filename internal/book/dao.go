@@ -135,10 +135,16 @@ func (dao *BasicDAO) GetMany(ctx context.Context, params *GetManyParams) ([]*Mod
 func (dao *BasicDAO) Create(ctx context.Context, model *Model) (*Model, error) {
 	logger := lgr.GetLogger(ctx)
 
+	rows := map[string]any{
+		"title":          model.Title,
+		"summary":        model.Summary,
+		"published_year": model.PublishedYear,
+	}
+
 	query := goqu.Dialect("postgres").
 		Insert("books").
 		Prepared(true).
-		Rows(model).
+		Rows(rows).
 		Returning("*")
 
 	sql, args, err := query.ToSQL()

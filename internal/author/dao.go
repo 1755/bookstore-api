@@ -134,10 +134,15 @@ func (dao *BasicDAO) GetMany(ctx context.Context, params *GetManyParams) ([]*Mod
 func (dao *BasicDAO) Create(ctx context.Context, model *Model) (*Model, error) {
 	logger := lgr.GetLogger(ctx)
 
+	rows := map[string]any{
+		"name": model.Name,
+		"bio":  model.Bio,
+	}
+
 	query := goqu.Dialect("postgres").
 		Insert("authors").
 		Prepared(true).
-		Rows(model).
+		Rows(rows).
 		Returning("*")
 
 	sql, args, err := query.ToSQL()
@@ -209,8 +214,7 @@ func (dao *BasicDAO) Delete(ctx context.Context, id ID) error {
 
 	query := goqu.Dialect("postgres").
 		Delete("authors").
-		Where(goqu.C("id").Eq(id)).
-		Prepared(true)
+		Where(goqu.C("id").Eq(id))
 
 	sql, args, err := query.ToSQL()
 	if err != nil {
@@ -218,7 +222,7 @@ func (dao *BasicDAO) Delete(ctx context.Context, id ID) error {
 	}
 
 	logger.Debug("executing delete query", zap.String("sql", sql), zap.Any("args", args))
-	result, err := dao.pool.Exec(ctx, sql, args)
+	result, err := dao.pool.Exec(ctx, sql)
 	if err != nil {
 		return err
 	}
