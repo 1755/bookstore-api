@@ -4,5 +4,6 @@
 /.vscode/
 /docker-compose.yaml
 /Dockerfile
-/scripts/
 /README.md
+/.devenv/
+/.direnv/

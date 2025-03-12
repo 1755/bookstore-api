@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"context"
+	"strings"
 
 	"github.com/1755/bookstore-api/internal/lgr"
 	"github.com/gin-gonic/gin"
@@ -10,6 +11,11 @@ import (
 
 func Logger(logger *zap.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if c.Request.URL.Path == "/health" || c.Request.URL.Path == "/metrics" || strings.HasPrefix(c.Request.URL.Path, "/swagger") {
+			c.Next()
+			return
+		}
+
 		ctx := c.Request.Context()
 		logger := lgr.GetLogger(ctx).With(
 			zap.String("method", c.Request.Method),

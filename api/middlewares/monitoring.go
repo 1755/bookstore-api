@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -29,6 +30,11 @@ var (
 
 func MetricsMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if c.Request.URL.Path == "/health" || c.Request.URL.Path == "/metrics" || strings.HasPrefix(c.Request.URL.Path, "/swagger") {
+			c.Next()
+			return
+		}
+
 		start := time.Now()
 
 		c.Next()
