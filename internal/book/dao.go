@@ -29,7 +29,6 @@ type UpdateField func(map[string]any)
 type DAO interface {
 	GetByID(ctx context.Context, id ID) (*Model, error)
 	GetMany(ctx context.Context, params *GetManyParams) ([]*Model, error)
-	GetManyByAuthorID(ctx context.Context, id int32) ([]*Model, error)
 	Create(ctx context.Context, model *Model) (*Model, error)
 	Update(ctx context.Context, id ID, fields ...UpdateField) (*Model, error)
 	Delete(ctx context.Context, id ID) error
@@ -240,43 +239,6 @@ func (dao *BasicDAO) Delete(ctx context.Context, id ID) error {
 	}
 
 	return nil
-}
-
-func (dao *BasicDAO) GetManyByAuthorID(ctx context.Context, id int32) ([]*Model, error) {
-	logger := lgr.GetLogger(ctx)
-
-	query := goqu.Dialect("postgres").
-		Select("books.id", "books.title", "books.summary", "books.published_year", "books.created_at", "books.updated_at").
-		From("books").
-		InnerJoin(goqu.T("book_authors"), goqu.On(
-			goqu.C("book_authors.book_id").Eq(goqu.T("books.id")),
-			goqu.C("book_authors.author_id").Eq(id),
-		)).
-		Prepared(true)
-
-	sql, args, err := query.ToSQL()
-	if err != nil {
-		return nil, InternalError.Wrap(err, "error building query")
-	}
-
-	logger.Debug("executing get many by author id query", zap.String("sql", sql), zap.Any("args", args))
-	rows, err := dao.pool.Query(ctx, sql, args...)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var books []*Model
-	for rows.Next() {
-		var book Model
-		err := rows.Scan(&book.ID, &book.Title, &book.Summary, &book.PublishedYear, &book.CreatedAt, &book.UpdatedAt)
-		if err != nil {
-			return nil, err
-		}
-		books = append(books, &book)
-	}
-
-	return books, nil
 }
 
 func (dao *BasicDAO) LinkAuthor(ctx context.Context, id ID, authorID int32) error {

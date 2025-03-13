@@ -5,7 +5,6 @@ import "context"
 type Service interface {
 	GetByID(ctx context.Context, id ID) (*Model, error)
 	GetMany(ctx context.Context, params *GetManyParams) ([]*Model, error)
-	GetManyByAuthorID(ctx context.Context, id int32) ([]*Model, error)
 	Create(ctx context.Context, model *Model) (*Model, error)
 	Update(ctx context.Context, id ID, fields ...UpdateField) (*Model, error)
 	Delete(ctx context.Context, id ID) error
@@ -41,10 +40,6 @@ func (s *BasicService) GetByID(ctx context.Context, id ID) (*Model, error) {
 
 func (s *BasicService) GetMany(ctx context.Context, params *GetManyParams) ([]*Model, error) {
 	return s.dao.GetMany(ctx, params)
-}
-
-func (s *BasicService) GetManyByAuthorID(ctx context.Context, id int32) ([]*Model, error) {
-	return s.dao.GetManyByAuthorID(ctx, id)
 }
 
 func (s *BasicService) LinkAuthor(ctx context.Context, id ID, authorID int32) error {
